@@ -33,8 +33,8 @@ function love.load(arg)
   panel.timer.value = GAMEPLAY_TIME
 
   panel.draw = function ()
-    love.graphics.printf(string.format("Points: %.3f", panel.points.value), 0, 0, 300, "left")
-    love.graphics.printf(string.format("Time: %.2f", panel.timer.value), 300, 0, 300, "left")
+    love.graphics.printf(string.format("Points: %.0f", panel.points.value), 0, 0, 300, "left")
+    love.graphics.printf(string.format("Time: %.0f", panel.timer.value), 300, 0, 300, "left")
   end
 
   gameState = {}
@@ -64,7 +64,7 @@ function love.load(arg)
     panel.timer.value = panel.timer.value - dt
     if panel.timer.value < 0 then
       panel.timer.value = GAMEPLAY_TIME
-      panel.message = string.format("Last game points: %.3f", panel.points.value) .. ". Press any key to start a game"
+      panel.message = string.format("Last game points: %.0f", panel.points.value) .. ". Press any key to start a game"
       panel.points.value = 0
 
       gameState.state = menuState
@@ -79,7 +79,7 @@ function love.load(arg)
 
     if love.mouse.isDown(LEFT_MOUSE_BUTTON) then
       if isButtonClicked(love.mouse.getX(), love.mouse.getY(), button.x, button.y, button.radius) then
-        panel.points.value = panel.points.value + button.displayTimeLeft
+        panel.points.value = panel.points.value + button.displayTimeLeft * 1000
 
         randomizePosition(button)
         button.displayTimeLeft = BUTTON_DISPLAY_TIME
