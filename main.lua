@@ -13,6 +13,7 @@ function love.load(arg)
 
   local LEFT_MOUSE_BUTTON = 1
   local GAMEPLAY_TIME = 10
+  local BUTTON_DISPLAY_TIME = 2
 
   love.graphics.setFont(love.graphics.newFont(30))
 
@@ -21,6 +22,7 @@ function love.load(arg)
   button.y = 0
   button.radius = 20
   button.color = {255/255, 0, 0, 1}
+  button.displayTimeLeft = BUTTON_DISPLAY_TIME
 
   panel = {}
   panel.points = {}
@@ -31,8 +33,8 @@ function love.load(arg)
   panel.timer.value = GAMEPLAY_TIME
 
   panel.draw = function ()
-    love.graphics.printf("Points: " .. panel.points.value, 0, 0, 150, "left")
-    love.graphics.printf("Time: " .. math.floor(panel.timer.value), 150, 0, 300, "left")
+    love.graphics.printf(string.format("Points: %.3f", panel.points.value), 0, 0, 300, "left")
+    love.graphics.printf(string.format("Time: %.2f", panel.timer.value), 300, 0, 300, "left")
   end
 
   gameState = {}
@@ -62,16 +64,25 @@ function love.load(arg)
     panel.timer.value = panel.timer.value - dt
     if panel.timer.value < 0 then
       panel.timer.value = GAMEPLAY_TIME
+      panel.message = string.format("Last game points: %.3f", panel.points.value) .. ". Press any key to start a game"
       panel.points.value = 0
-      panel.message = "Your score: " .. panel.points.value .. ". Press any key to start a game"
 
       gameState.state = menuState
     end
 
+    if button.displayTimeLeft <= 0 then
+      randomizePosition(button)
+      button.displayTimeLeft = BUTTON_DISPLAY_TIME
+    else
+      button.displayTimeLeft = button.displayTimeLeft - dt
+    end
+
     if love.mouse.isDown(LEFT_MOUSE_BUTTON) then
       if isButtonClicked(love.mouse.getX(), love.mouse.getY(), button.x, button.y, button.radius) then
+        panel.points.value = panel.points.value + button.displayTimeLeft
+
         randomizePosition(button)
-        panel.points.value = panel.points.value + 1
+        button.displayTimeLeft = BUTTON_DISPLAY_TIME
       end
     end
   end
@@ -79,7 +90,8 @@ function love.load(arg)
     panel.draw()
 
     local r, g, b, a = love.graphics.getColor()
-    love.graphics.setColor(button.color[1], button.color[2], button.color[3])
+    local transparency = button.displayTimeLeft / BUTTON_DISPLAY_TIME
+    love.graphics.setColor(button.color[1], button.color[2], button.color[3], transparency)
     love.graphics.circle("fill", button.x, button.y, button.radius)
     love.graphics.setColor(r, g, b, a)
   end
