@@ -1,3 +1,13 @@
+function isButtonClicked(mouseX, mouseY, buttonX, buttonY, buttonRadius)
+  return (mouseX - buttonX)^2 + (mouseY - buttonY)^2 < buttonRadius^2
+end
+
+function randomizePosition(button)
+  local width, height = love.graphics.getDimensions()
+  button.x = math.random(button.radius, width - button.radius)
+  button.y = math.random(button.radius, height - button.radius)
+end
+
 function love.load(arg)
   love.math.setRandomSeed(os.time())
 
@@ -45,14 +55,15 @@ function love.load(arg)
 
   gameplayState = {}
   gameplayState.init = function()
-    local width, height = love.graphics.getDimensions()
-    button.x = math.random(button.radius, width - button.radius)
-    button.y = math.random(button.radius, height - button.radius)
+    randomizePosition(button)
   end
   gameplayState.update = function (dt)
     panel.timer.value = panel.timer.value - dt
     if love.mouse.isDown(LEFT_MOUSE_BUTTON) then
-
+      if isButtonClicked(love.mouse.getX(), love.mouse.getY(), button.x, button.y, button.radius) then
+        randomizePosition(button)
+        panel.points.value = panel.points.value + 1
+      end
     end
   end
   gameplayState.draw = function ()
