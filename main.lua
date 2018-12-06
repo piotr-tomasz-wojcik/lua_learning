@@ -25,6 +25,7 @@ function love.load(arg)
   panel = {}
   panel.points = {}
   panel.timer = {}
+  panel.message = "Press any key to start a game"
 
   panel.points.value = 0
   panel.timer.value = GAMEPLAY_TIME
@@ -49,7 +50,7 @@ function love.load(arg)
     panel.draw()
 
     local width, height = love.graphics.getDimensions()
-    love.graphics.printf("Press any key to start a game", width/2.0, height/2.0, 300, "center")
+    love.graphics.printf(panel.message, width/2.0, height/2.0, 300, "center")
   end
 
 
@@ -59,6 +60,14 @@ function love.load(arg)
   end
   gameplayState.update = function (dt)
     panel.timer.value = panel.timer.value - dt
+    if panel.timer.value < 0 then
+      panel.timer.value = GAMEPLAY_TIME
+      panel.points.value = 0
+      panel.message = "Your score: " .. panel.points.value .. ". Press any key to start a game"
+
+      gameState.state = menuState
+    end
+
     if love.mouse.isDown(LEFT_MOUSE_BUTTON) then
       if isButtonClicked(love.mouse.getX(), love.mouse.getY(), button.x, button.y, button.radius) then
         randomizePosition(button)
