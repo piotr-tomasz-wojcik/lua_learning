@@ -1,12 +1,16 @@
 function love.load(arg)
+  love.math.setRandomSeed(os.time())
+
   local LEFT_MOUSE_BUTTON = 1
   local GAMEPLAY_TIME = 10
 
   love.graphics.setFont(love.graphics.newFont(30))
 
   button = {}
-  button.center = 0, 0
+  button.x = 0
+  button.y = 0
   button.radius = 20
+  button.color = {255/255, 0, 0, 1}
 
   panel = {}
   panel.points = {}
@@ -28,6 +32,7 @@ function love.load(arg)
   menuState.update = function (dt)
     if love.mouse.isDown(LEFT_MOUSE_BUTTON) then
       gameState.state = gameplayState
+      gameState.state.init()
     end
   end
   menuState.draw = function ()
@@ -39,8 +44,10 @@ function love.load(arg)
 
 
   gameplayState = {}
-  gameState.init = function()
-    
+  gameplayState.init = function()
+    local width, height = love.graphics.getDimensions()
+    button.x = math.random(button.radius, width - button.radius)
+    button.y = math.random(button.radius, height - button.radius)
   end
   gameplayState.update = function (dt)
     panel.timer.value = panel.timer.value - dt
@@ -51,8 +58,12 @@ function love.load(arg)
   gameplayState.draw = function ()
     panel.draw()
 
-
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor(button.color[1], button.color[2], button.color[3])
+    love.graphics.circle("fill", button.x, button.y, button.radius)
+    love.graphics.setColor(r, g, b, a)
   end
+
 
   gameState.state = menuState
 end
